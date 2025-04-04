@@ -64,7 +64,13 @@ mongoose.connect(process.env.MONGO_URI)
     
     // Start server
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`http://127.0.0.1:${PORT}`));
+    app.listen(PORT, () => {
+      if (process.env.NODE_ENV === 'production') {
+        console.log(`Server running in production mode on port ${PORT}`);
+      } else {
+        console.log(`Server running at http://127.0.0.1:${PORT}`);
+      }
+    });
   })
   .catch(err => {
     console.error('MongoDB connection error:', err.message);
