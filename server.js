@@ -20,13 +20,23 @@ app.use(express.json());
 
 // Enable CORS - simplified configuration
 app.use(cors({
-  origin: true, // Allow any origin
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://user-mangement-frontend.vercel.app', process.env.FRONTEND_URL] 
+    : 'http://localhost:3000',
   credentials: true // Allow credentials
 }));
 
 // Add additional CORS headers for preflight requests
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? ['https://user-mangement-frontend.vercel.app', process.env.FRONTEND_URL]
+    : ['http://localhost:3000'];
+    
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -54,7 +64,7 @@ mongoose.connect(process.env.MONGO_URI)
     
     // Start server
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`http://127.0.0.1:${PORT}`));
   })
   .catch(err => {
     console.error('MongoDB connection error:', err.message);
